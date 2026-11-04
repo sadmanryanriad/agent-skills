@@ -12,14 +12,14 @@ A larger context size does NOT automatically mean a better model. Sadman knows w
 2. DO NOT pick a model yourself. Ask: *"Which free model would you like me to use for this task?"* and wait for Sadman's explicit choice.
 3. If Sadman specifies multiple models for parallel execution, dispatch them accordingly.
 
-## Step 2: Execute Delegation
-Run the task with Sadman's chosen model:
+## Step 2: Execute Delegation (With Caveman Speed Engine)
+To prevent free-model queue latency and ensure fastest execution, enforce **Caveman format** on the worker output:
 ```bash
-free-worker -m "<sadman-chosen-model>" "$ARGUMENTS"
+free-worker -m "<sadman-chosen-model>" "$ARGUMENTS. Rule: Caveman format. Code/diff first, zero preamble, no pleasantries, terse status bullets."
 ```
 Or for read-only codebase exploration:
 ```bash
-free-worker -m "<sadman-chosen-model>" -a plan "$ARGUMENTS"
+free-worker -m "<sadman-chosen-model>" -a plan "$ARGUMENTS. Caveman format: terse bullets, exact paths."
 ```
 
 ### Parallel Scaling (When Applicable)

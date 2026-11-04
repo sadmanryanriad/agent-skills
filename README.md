@@ -6,15 +6,25 @@ A centralized, cross-device repository for AI coding assistant skills, custom sl
 
 ## Included Skills & Tools
 
-### `free-worker` (Subagent Token Saver)
+### 1. `free-worker` (Subagent Token Saver + Caveman Speed Engine)
 Offloads mechanical coding tasks, boilerplate generation, unit test drafting, and large file exploration to free models (via **OpenCode** and **OpenRouter**) at zero token cost.
 
 - **Antigravity CLI:** Triggered via `/free-worker <task>` or `"use free-worker to <task>"` (Progressive disclosure: 0 token overhead until invoked).
 - **Claude Code:** Triggered via `/free-worker <task>` (or shorthand `/worker <task>`).
 - **OpenAI Codex / Kimi / Any Harness:** Run directly via terminal/bash tool: `free-worker -m <model> "prompt"`.
 - **Interactive Model Selection (User Decides):** Real-time query of currently available free models and context windows (`free-worker -l`). The agent presents the list and waits for your explicit choice.
+- **Caveman Speed Engine:** Automatically commands free workers in caveman style (code-first, zero conversational fluff), cutting output tokens by up to 70% and accelerating task completion by 3x–5x.
 - **Dynamic Parallel Scaling:** Single worker for focused edits, or scaled parallel workers (`&`) across independent files or model races with provider balancing.
 - **Hardware Protection:** Governed by Linux cgroups (`systemd-run -p MemoryMax=512M -p CPUQuota=60%`).
+
+### 2. `caveman` (Terse Token-Saving Voice)
+- **Tagline:** *"Why use many token when few token do trick."*
+- **What it does:** Strips conversational ceremony, pleasantries, hedging, and filler from agent responses while keeping 100% of technical facts, commands, paths, and code blocks intact.
+- **Trigger:** Type `/caveman` (stays active until you say `stop caveman` or `normal mode`).
+
+### 3. `grill-me` (Relentless Plan & Architecture Stress-Tester)
+- **What it does:** Systematically stress-tests a plan, technical decision, or feature before writing code. Maps the proposal into a **design tree** and interviews you in structured question rounds along the prerequisite frontier.
+- **Trigger:** Type `/grill-me <plan or topic>`.
 
 ---
 
@@ -92,9 +102,12 @@ agent-skills/
 │   └── free-worker                           # Subagent CLI runner
 ├── antigravity/
 │   └── skills/
-│       └── free-worker/
-│           └── SKILL.md                      # Antigravity progressive skill
+│       ├── free-worker/SKILL.md              # Free worker with Caveman Speed Engine
+│       ├── caveman/SKILL.md                  # Official caveman brevity skill
+│       └── grill-me/SKILL.md                 # Relentless planning & interview skill
 └── claude/
     └── commands/
-        └── free-worker.md                    # Claude Code slash command
+        ├── free-worker.md                    # /free-worker slash command
+        ├── caveman.md                        # /caveman slash command
+        └── grill-me.md                       # /grill-me slash command
 ```
