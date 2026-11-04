@@ -12,47 +12,61 @@ Offloads mechanical coding tasks, boilerplate generation, unit test drafting, an
 - **Antigravity CLI:** Triggered via `/free-worker <task>` or `"use free-worker to <task>"` (Progressive disclosure: 0 token overhead until invoked).
 - **Claude Code:** Triggered via `/free-worker <task>` (or shorthand `/worker <task>`).
 - **OpenAI Codex / Kimi / Any Harness:** Run directly via terminal/bash tool: `free-worker -m <model> "prompt"`.
-- **Interactive Model Selection:** Real-time query of currently available free models and context windows (`free-worker -l`).
+- **Interactive Model Selection (User Decides):** Real-time query of currently available free models and context windows (`free-worker -l`). The agent presents the list and waits for your explicit choice.
 - **Dynamic Parallel Scaling:** Single worker for focused edits, or scaled parallel workers (`&`) across independent files or model races with provider balancing.
 - **Hardware Protection:** Governed by Linux cgroups (`systemd-run -p MemoryMax=512M -p CPUQuota=60%`).
 
 ---
 
-## 🚀 One-Shot AI Agent Setup Prompt (For Other Devices)
+## 🤖 AI Agent Prompts for Other Devices
 
-When you clone this repo onto any other computer (Windows WSL, Linux workstation, MacBook, VPS), open your AI agent (**Claude Code**, **Antigravity CLI**, **Codex**, etc.) and paste this prompt:
+Whenever you work on another computer (Windows WSL, `Riad-AMD` workstation, Intel workstation, MacBook, or VPS), paste one of the prompts below into your AI agent (**Claude Code**, **Antigravity CLI**, **Codex**, etc.):
 
-```text
-I have cloned my agent-skills repo to this machine at [PATH_TO_REPO]. Please run the installation script (`./install.sh`), verify that ~/.local/bin/free-worker, ~/.gemini/config/skills/free-worker/, and ~/.claude/commands/ are properly linked, and test that `free-worker -l` outputs the live free models table. Ensure my environment is ready to use free-worker subagents.
-```
-
-The agent will execute `install.sh`, verify symlinks, install OpenCode if missing, and test the models table automatically.
+### Option A: Universal Smart Prompt (Initial Setup OR Sync)
+> *"Sync my agent-skills: If `~/projects/agent-skills` does not exist, clone `https://github.com/sadmanryanriad/agent-skills.git` there. Then run `./sync.sh` (or `./install.sh` if first time) to non-destructively link skills and commands. Preserve all existing unique local skills on this device; if any skill has the same name but different content, ask me before modifying it. Finally, verify with `free-worker -l`."*
 
 ---
 
-## 🛠️ Universal Setup (Any Harness)
+### Option B: Quick Update / Sync Prompt (When You Pushed Changes)
+Use this when you edited a skill on one device, pushed to GitHub, and want your other machine to get the update:
+> *"Run `./sync.sh` inside `~/projects/agent-skills` to pull the latest skill updates and re-sync symlinks. Report any conflicts with my local skills."*
 
-### For Claude Code
-Type `/free-worker` directly:
-```text
-/free-worker draft pytest unit tests for auth service
+---
+
+## 🛡️ Edge Cases & Non-Destructive Appending (Workstation Safety)
+
+If your machine (e.g. `Riad-AMD`) already has local skills installed:
+1. **Never Overwrites Unique Skills:** Skills existing only on your local workstation are untouched.
+2. **Identical Skills are Ignored:** If a local skill is identical or already symlinked to the repo, it is skipped silently.
+3. **Conflict Detection:** If a local skill has the same name but **different content/description**, `./sync.sh` pauses and asks whether to keep your local version, overwrite it, or create a timestamped backup first.
+
+---
+
+## 🛠️ Manual CLI Setup
+
+### 1. Initial Clone & Install
+```bash
+git clone https://github.com/sadmanryanriad/agent-skills.git ~/projects/agent-skills
+cd ~/projects/agent-skills
+./install.sh
 ```
 
-### For Antigravity CLI
-Mention the skill:
-```text
-Use free-worker to find all callers of the payment webhook
+### 2. Syncing Future Updates
+```bash
+cd ~/projects/agent-skills
+./sync.sh
 ```
 
-### For OpenAI Codex / Kimi / Aider / Cursor / Any AI Harness
-Add this snippet to your harness's system instructions, `AGENTS.md`, or custom instructions:
-```markdown
-## Free Subagent Worker Protocol (`free-worker`)
-When handling mechanical boilerplate, unit tests, or large file exploration:
-- Query real-time free models: `free-worker -l`
-- Run task: `free-worker -m <model> "prompt"` (or `-a plan` for read-only sweeps)
-- Parallel scaling: Dispatch concurrent workers (`&`) on distinct files across different providers to avoid rate limits.
-- Latency fallback: If a model hangs >45s, ask user permission to switch to another active model.
+### 3. (Optional) Configure OpenRouter Key
+To enable OpenRouter's free tier models in addition to OpenCode's built-in free models:
+```bash
+echo 'export OPENROUTER_API_KEY="sk-or-v1-your-key-here"' > ~/.config/opencode/.env
+chmod 600 ~/.config/opencode/.env
+```
+
+### 4. Verify Installation
+```bash
+free-worker -l
 ```
 
 ---
@@ -60,29 +74,9 @@ When handling mechanical boilerplate, unit tests, or large file exploration:
 ## 🔒 Strict Zero-Secret Policy (Public Repo Safe)
 
 This repository is designed to be safe as a **public** repository:
-1. **Never commit `.env` or credentials:** All keys must reside locally in `~/.config/opencode/.env` or `~/.local/share/opencode/auth.json`.
-2. **Automated Git Pre-Commit Scanner:** An automated hook (`.git/hooks/pre-commit`) blocks any commit containing API key patterns (`sk-or-v1-`, `ghp_`, `sk-ant-`, etc.).
+1. **Local Keys Only:** API keys reside in `~/.config/opencode/.env` (mode `600`) outside the repo.
+2. **Automated Git Pre-Commit Scanner:** An automated hook (`.git/hooks/pre-commit`) blocks any commit containing API key patterns (`sk-or-v1-`, `ghp_`, `sk-ant-`, `sk-`).
 3. **Strict `.gitignore`:** Ignores all `.env*` (except `.env.example`), `*.key`, `*.token`, and `*.db` files.
-
----
-
-## 📖 Direct CLI Usage
-
-```bash
-# Check real-time free models + context sizes
-free-worker -l
-
-# Run a quick code generation task
-free-worker "Write a python function to parse ISO timestamps"
-
-# Read-only exploration (won't modify files)
-free-worker -a plan "Explain how background tasks are handled in this codebase"
-
-# Parallel execution across two independent files
-free-worker -m opencode/deepseek-v4.1-flash-free "Write tests for auth.py" &
-free-worker -m openrouter/openrouter/free "Write tests for router.py" &
-wait
-```
 
 ---
 
@@ -90,8 +84,9 @@ wait
 
 ```text
 agent-skills/
-├── README.md
-├── install.sh                                # Automated setup script
+├── README.md                                 # Documentation & AI Agent Prompts
+├── install.sh                                # Automated setup & OpenCode installer
+├── sync.sh                                   # Conflict-aware non-destructive sync
 ├── .gitignore                                # Strict zero-secret policy
 ├── bin/
 │   └── free-worker                           # Subagent CLI runner

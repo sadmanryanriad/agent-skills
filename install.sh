@@ -25,23 +25,7 @@ fi
 
 export PATH="$HOME/.opencode/bin:$HOME/.local/bin:$PATH"
 
-# 3. Symlink free-worker binary
-echo "Linking free-worker runner to ~/.local/bin/free-worker..."
-chmod +x "$SCRIPT_DIR/bin/free-worker"
-ln -sf "$SCRIPT_DIR/bin/free-worker" "$HOME/.local/bin/free-worker"
-
-# 4. Link Antigravity Global Skill
-mkdir -p "$HOME/.gemini/config/skills/free-worker"
-echo "Linking Antigravity skill to ~/.gemini/config/skills/free-worker/..."
-ln -sf "$SCRIPT_DIR/antigravity/skills/free-worker/SKILL.md" "$HOME/.gemini/config/skills/free-worker/SKILL.md"
-
-# 5. Link Claude Code Command
-mkdir -p "$HOME/.claude/commands"
-echo "Linking Claude Code command to ~/.claude/commands/..."
-ln -sf "$SCRIPT_DIR/claude/commands/free-worker.md" "$HOME/.claude/commands/free-worker.md"
-ln -sf "$SCRIPT_DIR/claude/commands/free-worker.md" "$HOME/.claude/commands/worker.md"
-
-# 6. Install Git Pre-Commit Hook (Prevents Secret Leaks)
+# 3. Install Git Pre-Commit Hook (Prevents Secret Leaks)
 if [[ -d "$SCRIPT_DIR/.git" ]]; then
     mkdir -p "$SCRIPT_DIR/.git/hooks"
     cat << 'EOF' > "$SCRIPT_DIR/.git/hooks/pre-commit"
@@ -56,7 +40,7 @@ EOF
     chmod +x "$SCRIPT_DIR/.git/hooks/pre-commit"
 fi
 
-# 7. Ensure OpenCode config directory exists
+# 4. Ensure OpenCode config directory exists
 mkdir -p "$HOME/.config/opencode"
 if [[ ! -f "$HOME/.config/opencode/.env" ]]; then
     cat << 'EOF' > "$HOME/.config/opencode/.env.example"
@@ -66,7 +50,10 @@ EOF
     echo "Tip: To enable OpenRouter free models, create ~/.config/opencode/.env with your key."
 fi
 
+# 5. Run smart sync (non-destructive link & conflict check)
+"$SCRIPT_DIR/sync.sh"
+
 echo ""
-echo "=== Installation Complete! ==="
+echo "=== Installation & Setup Complete! ==="
 echo "Test the live free models table with:"
 echo "  free-worker -l"
