@@ -2,13 +2,13 @@
 name: free-worker
 description: >-
   Delegate mechanical coding tasks, boilerplate generation, unit test drafting,
-  or codebase exploration to free stealth models (DeepSeek, GLM, LLaMA-70B, etc.)
+  or codebase exploration to free stealth models (DeepSeek, GLM, LLaMA, etc.)
   via OpenCode at zero token cost.
 ---
 
 # Free Worker Subagent (OpenCode / OpenRouter)
 
-Use `free-worker` to offload grunt work to free models dynamically without consuming premium agent tokens.
+Use `free-worker` to offload grunt work to free models dynamically without consuming premium agent tokens. Compatible with Antigravity, Claude Code, Codex, and any CLI-capable AI harness.
 
 ## Interactive Model Consultation Protocol (Mandatory)
 Before delegating tasks in a session:
@@ -24,17 +24,19 @@ Execute the `free-worker` binary via your command/bash tool:
 free-worker -l
 
 # Code generation / editing (default 'build' agent):
-free-worker -m <chosen-model> "Draft 5 pytest unit tests for app/torrent_sentinel.py"
+free-worker -m <chosen-model> "Draft pytest unit tests for app/torrent_sentinel.py"
 
 # Read-only exploration / research ('plan' agent):
 free-worker -m <chosen-model> -a plan "Find all places where router credentials are used"
 ```
 
-## Parallel Execution (When Work Suits Multiple Agents)
-- When a task splits into independent files (e.g. `tests/test_a.py` and `tests/test_b.py`) or to race models for speed:
-  - Run up to 2 workers in parallel using distinct providers (e.g. one on OpenCode built-in, one on OpenRouter) to bypass single-provider rate limits.
-  - Strictly isolate file targets so concurrent workers never overwrite each other.
+## Parallel Execution & Scaling (Dynamic)
+Single or multiple workers can be dispatched depending on the workload:
+- **Independent Task Splitting:** When work naturally divides across distinct files (e.g. tests for module A, B, and C), launch concurrent background workers (`&`) simultaneously.
+- **Model Racing:** For complex tasks, dispatch multiple distinct models in parallel and merge the cleanest solution.
+- **Provider Balancing:** When scaling concurrency, distribute workers across providers (e.g., OpenCode built-in vs OpenRouter) to avoid single-provider concurrency rate limits.
+- **Strict File Isolation:** Every concurrent worker must own a separate, distinct file target—never let parallel workers write to the same destination file.
 
 ## Hardware & System Safety
-- The worker automatically runs under a 512MB RAM and 60% CPU cgroup clamp via `systemd-run` to protect the Asus server.
-- The smart agent must always review, syntax-check (`python -m py_compile`), and verify the worker's output before committing.
+- Automatically runs under a 512MB RAM and 60% CPU cgroup clamp via `systemd-run` to protect host resources.
+- The orchestrator agent must always review, syntax-check (`python -m py_compile`), and verify the worker's output before committing.

@@ -10,7 +10,7 @@ Run `free-worker -l` to fetch the real-time list of available free models and th
 Present the active options to Sadman and ask which model he wants to use for this task.
 
 ## Step 2: Execute Delegation
-Once Sadman selects a model (or if he specifies one in the arguments), run:
+Once Sadman selects a model (or if specified in arguments), run:
 ```bash
 free-worker -m "<selected-model>" "$ARGUMENTS"
 ```
@@ -19,13 +19,14 @@ Or for read-only codebase exploration:
 free-worker -m "<selected-model>" -a plan "$ARGUMENTS"
 ```
 
-### Parallel Workers (When Applicable)
-- When a large task can be split across independent files (e.g. tests for module A vs module B), or to race two models for speed:
-  - Run up to 2 workers in parallel in background (`&`) using distinct models (e.g. one `opencode/deepseek-v4.1-flash-free` and one `openrouter/openrouter/free` to avoid single-provider rate limits).
-  - Never assign the same destination file to concurrent workers.
+### Parallel Scaling (Dynamic)
+- Single or multiple workers can be dispatched depending on the task:
+  - If work splits across distinct files (e.g. tests for module A and module B) or to race models for speed/quality, run concurrent workers in background (`&`).
+  - Distribute parallel workers across distinct providers (e.g. OpenCode built-in vs OpenRouter) to evade single-provider rate limits.
+  - Never allow multiple workers to write to the same destination file simultaneously.
 
 ## Step 3: Latency & Expiry Guardrail
-- If the model takes >45–60s without responding or errors out (due to capacity/expiration):
+- If a model takes >45–60s without responding or errors out (due to capacity/expiration):
   - Do NOT hang or fail silently.
   - Stop immediately and ask Sadman's permission to switch to a fallback free model (e.g. `opencode/deepseek-v4.1-flash-free` or `openrouter/openrouter/free`).
 

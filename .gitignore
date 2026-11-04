@@ -1,0 +1,21 @@
+# Environment & Secrets (Strict Zero-Secret Policy)
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.token
+auth.json
+credentials.json
+*.db
+*.sqlite
+*.sqlite3
+*.log
+
+# OS & Editor artifacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*~
+*.swp

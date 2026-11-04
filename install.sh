@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# agent-skills Installer — Cross-Device Setup for Antigravity & Claude Code
+# agent-skills Installer — Cross-Device Setup for Antigravity, Claude Code, Codex & AI Harnesses
 # ==============================================================================
 
 set -euo pipefail
@@ -41,7 +41,22 @@ echo "Linking Claude Code command to ~/.claude/commands/..."
 ln -sf "$SCRIPT_DIR/claude/commands/free-worker.md" "$HOME/.claude/commands/free-worker.md"
 ln -sf "$SCRIPT_DIR/claude/commands/free-worker.md" "$HOME/.claude/commands/worker.md"
 
-# 6. Ensure OpenCode config directory exists
+# 6. Install Git Pre-Commit Hook (Prevents Secret Leaks)
+if [[ -d "$SCRIPT_DIR/.git" ]]; then
+    mkdir -p "$SCRIPT_DIR/.git/hooks"
+    cat << 'EOF' > "$SCRIPT_DIR/.git/hooks/pre-commit"
+#!/usr/bin/env bash
+# Secret scanner pre-commit hook
+if git diff --cached | grep -iE 'sk-or-v1-[0-9a-zA-Z]{20,}|ghp_[0-9a-zA-Z]{20,}|sk-ant-[0-9a-zA-Z]{20,}|sk-[0-9a-zA-Z]{30,}'; then
+    echo "ERROR: Attempted to commit what looks like an API key or secret token!" >&2
+    echo "Commit rejected to protect public repository security." >&2
+    exit 1
+fi
+EOF
+    chmod +x "$SCRIPT_DIR/.git/hooks/pre-commit"
+fi
+
+# 7. Ensure OpenCode config directory exists
 mkdir -p "$HOME/.config/opencode"
 if [[ ! -f "$HOME/.config/opencode/.env" ]]; then
     cat << 'EOF' > "$HOME/.config/opencode/.env.example"
